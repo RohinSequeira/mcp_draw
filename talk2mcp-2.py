@@ -182,25 +182,25 @@ Your entire response should be a single line starting with either FUNCTION_CALL:
                         parts = [p.strip() for p in function_info.split("|")]
                         func_name, params = parts[0], parts[1:]
                         
-                        print(f"\nDEBUG: Raw function info: {function_info}")
-                        print(f"DEBUG: Split parts: {parts}")
-                        print(f"DEBUG: Function name: {func_name}")
-                        print(f"DEBUG: Raw parameters: {params}")
+                        #print(f"\nDEBUG: Raw function info: {function_info}")
+                        #print(f"DEBUG: Split parts: {parts}")
+                        #print(f"DEBUG: Function name: {func_name}")
+                        #print(f"DEBUG: Raw parameters: {params}")
                         
                         try:
                             # Find the matching tool to get its input schema
                             tool = next((t for t in tools if t.name == func_name), None)
                             if not tool:
-                                print(f"DEBUG: Available tools: {[t.name for t in tools]}")
+                                #print(f"DEBUG: Available tools: {[t.name for t in tools]}")
                                 raise ValueError(f"Unknown tool: {func_name}")
 
-                            print(f"DEBUG: Found tool: {tool.name}")
-                            print(f"DEBUG: Tool schema: {tool.inputSchema}")
+                            #print(f"DEBUG: Found tool: {tool.name}")
+                            #print(f"DEBUG: Tool schema: {tool.inputSchema}")
 
                             # Prepare arguments according to the tool's input schema
                             arguments = {}
                             schema_properties = tool.inputSchema.get('properties', {})
-                            print(f"DEBUG: Schema properties: {schema_properties}")
+                            #print(f"DEBUG: Schema properties: {schema_properties}")
 
                             for param_name, param_info in schema_properties.items():
                                 if not params:  # Check if we have enough parameters
@@ -209,7 +209,7 @@ Your entire response should be a single line starting with either FUNCTION_CALL:
                                 value = params.pop(0)  # Get and remove the first parameter
                                 param_type = param_info.get('type', 'string')
                                 
-                                print(f"DEBUG: Converting parameter {param_name} with value {value} to type {param_type}")
+                                #print(f"DEBUG: Converting parameter {param_name} with value {value} to type {param_type}")
                                 
                                 # Convert the value to the correct type based on the schema
                                 if param_type == 'integer':
@@ -224,15 +224,15 @@ Your entire response should be a single line starting with either FUNCTION_CALL:
                                 else:
                                     arguments[param_name] = str(value)
 
-                            print(f"DEBUG: Final arguments: {arguments}")
-                            print(f"DEBUG: Calling tool {func_name}")
+                            # print(f"DEBUG: Final arguments: {arguments}")
+                            # print(f"DEBUG: Calling tool {func_name}")
                             
                             result = await session.call_tool(func_name, arguments=arguments)
-                            print(f"DEBUG: Raw result: {result}")
+                            #print(f"DEBUG: Raw result: {result}")
                             
                             # Get the full result content
                             if hasattr(result, 'content'):
-                                print(f"DEBUG: Result has content attribute")
+                                #print(f"DEBUG: Result has content attribute")
                                 # Handle multiple content items
                                 if isinstance(result.content, list):
                                     iteration_result = [
@@ -242,10 +242,10 @@ Your entire response should be a single line starting with either FUNCTION_CALL:
                                 else:
                                     iteration_result = str(result.content)
                             else:
-                                print(f"DEBUG: Result has no content attribute")
+                                #print(f"DEBUG: Result has no content attribute")
                                 iteration_result = str(result)
                                 
-                            print(f"DEBUG: Final iteration result: {iteration_result}")
+                            #print(f"DEBUG: Final iteration result: {iteration_result}")
                             
                             # Format the response based on result type
                             if isinstance(iteration_result, list):
@@ -260,8 +260,8 @@ Your entire response should be a single line starting with either FUNCTION_CALL:
                             last_response = iteration_result
 
                         except Exception as e:
-                            print(f"DEBUG: Error details: {str(e)}")
-                            print(f"DEBUG: Error type: {type(e)}")
+                            # print(f"DEBUG: Error details: {str(e)}")
+                            # print(f"DEBUG: Error type: {type(e)}")
                             import traceback
                             traceback.print_exc()
                             iteration_response.append(f"Error in iteration {iteration + 1}: {str(e)}")
